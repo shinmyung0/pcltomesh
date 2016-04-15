@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Point Cloud to Mesh by shinmyung0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Point Cloud to Mesh</h1>
+      <h2 class="project-tagline">Point cloud data to mesh with possible down sampling.</h2>
+      <a href="https://github.com/shinmyung0/pcltomesh" class="btn">View on GitHub</a>
+      <a href="https://github.com/shinmyung0/pcltomesh/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/shinmyung0/pcltomesh/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h3>
+<a id="team" class="anchor" href="#team" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Team</h3>
+
+<p>Shin Yoon. Just want to try doing this on my own.</p>
+
+<h3>
+<a id="background" class="anchor" href="#background" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Background</h3>
+
+<p>The idea is simple. A point cloud is just a bunch of unordered vertices. What we want to do is to group these vertices into triangles to form a mesh. Why is this useful? This is extremely useful in fields like 3D reconstruction, where you have large amounts of point cloud data from RGBD cameras or lidar, and you want to recreate a mesh representing the object that you scanned. This is how meshes of objects scanned for 3D printers are generated. This is also useful in SLAM(Simultaneous Localization and Mapping) for robots trying to create a 3D reconstruction of their surroundings. </p>
+
+<p>This is the reason why this project is interesting for me personally. I'm currently involved in research regarding super-resolution SLAM on UAVs. The idea is to use localized RGBD point cloud data and then generate a mesh of the surroundings. Then using a high resolution camera map textures to this mesh of a view that the UAV is "seeing." The first part of this research project is something that I've been interested in, so I wanted to try to implement the basics within the scope of this project. </p>
+
+<p>To start off I plan to try to implement <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">this paper</a> using the mesh data provided <a href="http://graphics.stanford.edu/data/3Dscanrep/">here</a>. Afterwards, once I get it working on standard data sets, I want to try to implement a form of down sampling as well to try and simplify the point cloud before running a meshing algorithm on it. This part is important because in our own research, the point clouds that are generated are extremely dense, but a lot of the data can be reduced and still generate a nice mesh. But the main goal for this project is to actual implement the mesh generation algorithm.</p>
+
+<h3>
+<a id="resources" class="anchor" href="#resources" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Resources</h3>
+
+<p>Language + Platform : C++/ OpenGL </p>
+
+<p>I am planning on using our hw2 code base to use as the starting point. I think the visualizer was useful and using that as the starting point will help me debug and implement faster. </p>
+
+<h3>
+<a id="goals-and-deliverables" class="anchor" href="#goals-and-deliverables" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Goals and Deliverables</h3>
+
+<p>My main deliverable will be to demo the mesh generation algorithm using vertices from the <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3D Scanning Repository</a>. I plan to implement the <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">ball pivot algorithm</a> to show how vertices can be grouped together to form a mesh.</p>
+
+<p><img src="http://cs184.eecs.berkeley.edu/cs184_sp16_content/article_images/21_2.jpg" alt="Point Cloud to Mesh"></p>
+
+<p>In terms of aspirational goals, I want to also implement the <a href="http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf">Poisson Surface Reconstruction Algorithm</a> and do a comparison of the two methods on a model. Then if that goes well, I want to try to run my algorithm on actual point cloud data from the SLAM program that we are running in my research project. This would hopefully generate a rough mesh of whatever the RGBD camera is seeing localized. This would involve writing a <a href="http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber">ROS Publisher/Subscriber</a> wrapper around my mesh generator, and streaming the data from the SLAM program and back out into <a href="http://wiki.ros.org/rviz">Rviz</a>. </p>
+
+<h3>
+<a id="schedule" class="anchor" href="#schedule" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Schedule</h3>
+
+<ul>
+<li>April 24th - Finish the Ball Pivot Algorithm + augment HW2 code base to incorporate it</li>
+<li>May 1st - try to implement Poisson Surface Reconstruction and compare with Ball Pivot Algorithm</li>
+<li>May 3rd - Possibly look into ROS integration and writing a publisher/subscriber, prepare demo.</li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/shinmyung0/pcltomesh">Point Cloud to Mesh</a> is maintained by <a href="https://github.com/shinmyung0">shinmyung0</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
