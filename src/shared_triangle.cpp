@@ -1,0 +1,52 @@
+#include "shared_triangle.h"
+#include "util.h"
+
+MeshedTriangle::MeshedTriangle()
+{
+	vertices.clear();
+	ballCenter = pcl::PointNormal();
+	ballRadius = 0;
+}
+
+MeshedTriangle::MeshedTriangle(const pcl::PointNormal &_v0, const pcl::PointNormal &_v1, const pcl::PointNormal &_v2, const int _index0, const int _index1, const int _index2, const pcl::PointNormal &_ballCenter, const double _ballRadius)
+{
+	vertices.resize(3);
+	vertices[0] = std::make_pair((pcl::PointNormal *) &_v0, _index0);
+	vertices[1] = std::make_pair((pcl::PointNormal *) &_v1, _index1);
+	vertices[2] = std::make_pair((pcl::PointNormal *) &_v2, _index2);
+	ballCenter = _ballCenter;
+	ballRadius = _ballRadius;
+}
+
+MeshedTriangle::MeshedTriangle(pcl::PointNormal *_v0, pcl::PointNormal *_v1, pcl::PointNormal *_v2, const int _index0, const int _index1, const int _index2, const Eigen::Vector3f &_ballCenter, const double _ballRadius)
+{
+	vertices.resize(3);
+	vertices[0] = std::make_pair(_v0, _index0);
+	vertices[1] = std::make_pair(_v1, _index1);
+	vertices[2] = std::make_pair(_v2, _index2);
+	ballCenter = Util::makePointNormal(_ballCenter.x(), _ballCenter.y(), _ballCenter.z());
+	ballRadius = _ballRadius;
+}
+
+MeshedTriangle::MeshedTriangle(const MeshedTriangle &_other)
+{
+	vertices = _other.vertices;
+	ballCenter = _other.ballCenter;
+	ballRadius = _other.ballRadius;
+}
+
+MeshedTriangle::~MeshedTriangle()
+{
+}
+
+MeshedTriangle &MeshedTriangle::operator=(const MeshedTriangle &_other)
+{
+	if (this != &_other)
+	{
+		vertices = _other.vertices;
+		ballCenter = _other.ballCenter;
+		ballRadius = _other.ballRadius;
+	}
+
+	return *this;
+}

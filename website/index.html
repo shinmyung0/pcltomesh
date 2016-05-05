@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title>Shin Yoon  |  Assignment 2</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">Assignment 2: GeoMenagerie</h1>
+    <h2 align="middle">Shin Yoon</h2>
+
+    <div class="padded">
+
+
+        <p>Assignment 2 was really interesting because we got to play around with all the underlying geometric structures, understand how they are organized as halfedge data structures, as well as get to write simple shaders! I learned a lot about graphics, and also understood how much work 3D modelling can be. Using Blender's UI was really awkward and painful...But it was very enlightening.</p>
+
+
+
+    <h2 align="middle">Part 1: Fun with Bezier Patches</h2>
+        <p>I implemented Bezier patches using matrices. <a href="http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/AV0405/DONAVANIK/bezier.html">This article</a> in particular was very helpful in helping me understand and implement Bezier surfaces.</p>
+        
+        <p>In my preprocess() function, I extracted all the x,y,z coordinates from my control points to create the Gx, Gy, Gz matrices outlined in the above article. I also defined the Bezier basis matrix in the preprocess() function as well. Then I created a nested loop for the u,v parameters inside of the add2Mesh() which sampled in the u,v parameter space and for each "grid" called my evaluate() function. Then I used the Bezier basis matrix and the U,V vectors to calculate each of the x(u,v), y(u,v), z(u, v) values to draw 2 triangles for each grid.
+        </p>
+
+        <div align="left">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/1-1.png" width="800px" />
+                    <figcaption align="middle">Teapot mesh rendered using Bezier Patches</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/1-2.png" width="800px" />
+                    <figcaption align="middle">Cow mesh rendered using Bezier Patches</figcaption>
+                </tr>
+            </table>
+        </div>
+
+
+	<h2 align="middle">Part 2: Average normals for half-edge meshes</h2>
+        <p>To calculate the average normal vector at a vertex, I iterated through all the neighboring vertices and computed their normals and averaged the sum. To do this I looped through the halfedges that radiate from the current vertex. It was simple to calculate the normal vector by using the cross product of two vectors adjacent vectors. Since the cross product is already proportional to the area of the triangle, the average is proportional to the area normals.
+        </p>
+
+        <div align="left">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/2-1.png" width="800px" />
+                    <figcaption align="middle">Shading without smoothed normals.</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/2-2.png" width="800px" />
+                    <figcaption align="middle">Shading without smoothed vertex normals</figcaption>
+                </tr>
+            </table>
+        </div>
+
+	<h2 align="middle">Part 3: Edge Flip</h2>
+        <p>To implement the flip, I just started by grabbing all the pointers I would need to manipulate. Then I drew a diagram of how the relationship of the halfedges, vertices, edges, and faces changed and used setNeighbors(), as well as the reference pointers to set all the pointers to the required state.
+        </p>
+
+        <p>
+        I didn't have quite the epic debugging journey, but one of bugs I had when I did this part was whenever I flipped the edge the two faces would just disappear. So my flipEdge() actually just punched holes in the meshes for a while... I later figured out by using the check_for() functions that my faces didn't have pointers to the right halfedges, which was a tiring thing to find out going through all the hexcodes of the pointers one by one.
+        </p>
+
+        <div align="left">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/3-1.png" width="800px" />
+                    <figcaption align="middle">Normal Mesh</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/3-2.png" width="800px" />
+                    <figcaption align="middle">Mesh with flipped edges</figcaption>
+                </tr>
+            </table>
+        </div>
+
+	<h2 align="middle">Part 4: Edge Split</h2>
+        <p>Edge splitting was considerably more work because there were a lot more pointers to take care of. But the method in just grabbing all the pointers and creating all the new elements in the beginning and then just assigning everything according to a diagram worked out the same. I got a segfault in the beginning because of typo errors, but beyond that, this part went surprisingly smoothly. I guess the tricky part was thinking about all the new halfedges, edges, and faces being created and the pointers getting tangled up. But check_for() was definitely helped making sure everything pointed to everything.
+        </p>
+
+
+        <div align="left">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/4-1.png" width="800px" />
+                    <figcaption align="middle">Normal Mesh</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/4-2.png" width="800px" />
+                    <figcaption align="middle">Mesh with multiple split edges</figcaption>
+                </tr>
+            </table>
+        </div>
+
+	<h2 align="middle">Part 5: Upsampling via Loop Subdivision</h2>
+        <p>
+        I had a <i>really</i> difficult time understanding the algorithm for this. I think in part it was because the diagrams were really unintuitive to me. Instead of thinking of the two diagrams as separate operations, I thought they were like a "before" and "after" picture--except that didn't really make any sense. I read a few more articles on loop subdivision and read the descriptions a little more carefully, which helped me finally understand that repositioning old vertices and creating new vertices were separate operations.
+
+        </p>
+        <p>
+        Once I understood the algorithm, the coding part was relatively simple. The suggested implementation tips were really helpful in this part. I guess it didn't immediately feel intuitive that spliting all the edges, and then flipping ones connected to old and new vertices would actually cause the subdivision to work. Also imagining the vertices all shifting once this was done was also something that took me a while to realize.
+        </p> 
+
+        <h3>Loop Subdivision Notes </h3>
+        <p> Q1. What happens to sharp corners and edges? </p>
+        <p> A. Because all the edges are split as vertices repositioned in loop subdivision, sharp corners get rounded down.
+        </p>
+        <p>Q2. Can you lessen this effect by pre-splitting edges? What about symmetry?</p>
+        <p>A. Yes. While you can't get rid of the rounding effect completely, you can try to pre split some of the edges on the face edges so that the face is subdivided evenly in all directions. This will ensure that all the faces will subdivide into new faces evenly.
+        </p>
+        <br>
+        <div align="left">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/5-1.png" width="500px" />
+                    </td>
+                    <td align="middle">
+                    <img src="images/5-2.png" width="500px" />
+                    </td>
+                    <td align="middle">
+                    <img src="images/5-3.png" width="500px" />
+
+                    </td>
+                </tr>
+            </table>
+            <br>
+            <figcaption align="middle">Normal Cube Subdivision. <br>The cube converges to spherical shape and is asymmetrical.</figcaption>
+        </div>
+        <div align="left">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/symm-1.png" width="500px" />
+                    </td>
+                    <td align="middle">
+                    <img src="images/symm-2.png" width="500px" />
+                    </td>
+                    <td align="middle">
+                    <img src="images/symm-3.png" width="500px" />
+
+                    </td>
+                </tr>
+            </table>
+            <br>
+            <figcaption align="middle">Symmetric Cube Subdivision with presplit edges. Noticeably less spherical and symmetrically subdivided.</figcaption>
+        </div>
+
+	<h2 align="middle">Part 6: Fun with Shaders</h2>
+        <p>This part was really interesting because I had not really understood the lecture when Prof. Ng was explaining how all the different lighting effects came together. But seeing it in code really helped me understood how all of the lighting effects could be calculated and used to scale a color vector. Reflective mapping was interesting because it seemed to be exactly like texture mapping, except instead of mapping u,v coordinates to a 2D plane, you were mapping theta, phi spherical coordinates to a 3D texture in the shape of a sphere.
+        </p>
+        <p> For Phong shading, you can see the much brighter spot that shows off the Specular lighting effects. For reflective you can see the texture image being mapped across the surface of the mesh in a way that simulates being "reflected" off of it.
+        </p>
+
+
+        <div align="left">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/6-1.png" width="800px" />
+                    <figcaption align="middle">Default OpenGL shader</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/6-2.png" width="800px" />
+                    <figcaption align="middle">Phong Shading</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/6-3.png" width="800px" />
+                    <figcaption align="middle">Reflective Mapping</figcaption>
+                </tr>
+            </table>
+        </div>
+
+    <h2 align="middle">Part 7: Design you own mesh!</h2>
+        <p>To be really honest, I did not enjoy this part because working with Blender was just a real pain. The interface was extremely unintuitive, and it did not help that they changed all the normal "muscle memory" interactions like left mouse-click being select and flipping them. For the most part I changed up the humanoid mesh that was in the tutorial and put it in a different pose. I think modeling might be interesting, but definitely not using Blender.
+        </p>
+
+        <div align="left">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/7-1.png" width="500px" />
+                    </td>
+                    <td align="middle">
+                    <img src="images/7-2.png" width="500px" />
+                    </td>
+                    <td align="middle">
+                    <img src="images/7-3.png" width="500px" />
+                    </td>
+                </tr>
+                
+            </table>
+            <figcaption align="middle">Subdivision of custom mesh</figcaption>
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/7-4.png" width="800px" />
+                    </td>
+                </tr>
+                
+            </table>
+            <figcaption align="middle">Final mesh rendering with reflective mapping</figcaption>
+        </div>
+
+</div>
+</body>
+</html>
+
+
+
+
