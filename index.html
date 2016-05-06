@@ -68,40 +68,86 @@ Libraries : Point Cloud Library (File parsing, Data manipulation), Eigen (Vector
 <h3>
 <a id="1-summary" class="anchor" href="#1-summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Summary</h3>
 
-<p>This is the final report write up for CS184 Spring 2016. I finished my main goal of implementing the Ball Pivoting Algorithm to generate a mesh from point cloud data, although I did not quite reach my aspirational goals. In the process of implementing this project, I learned a lot about the trade offs involved in generating a mesh from point cloud data. I plan to continue to develop on this project even after this semester, and hopefully reach my aspirational goals some time in the future, mainly testing out Poisson Surface Reconstruction as well as integration with UAV point cloud data. There were some divergences from my original proposal, mainly involving the data sets being used. I originally planned to use the Stanford 3D Scanning Repository, but when I opened the .ply files, I found that there were already polygon relationships defined inside. I wanted to test on more realistic point cloud data, so instead I found <a href="pcd_files">this</a> which were .pcd containing only vertices. This format was specifically designed to contain point cloud data, and also the format was well supported within the Point Cloud Library(PCL).</p>
+<p>This is the final report write up for CS184 Spring 2016. I finished my main goal of implementing the Ball Pivoting Algorithm to generate a mesh from point cloud data, although I did not quite reach my aspirational goals. In the process of implementing this project, I learned a lot about the trade offs involved in generating a mesh from point cloud data. I plan to continue to develop on this project even after this semester, and hopefully reach my aspirational goals some time in the future, mainly testing out Poisson Surface Reconstruction as well as integration with UAV point cloud data. There were some divergences from my original proposal, mainly involving the data sets being used. I originally planned to use the Stanford 3D Scanning Repository, but when I opened the .ply files, I found that there were already polygon relationships defined inside. I wanted to test on more realistic point cloud data, so instead I found <a href="pcd_files">a repository of .pcd files</a> containing only vertices. This format was specifically designed to contain point cloud data, and also the format was well supported within the Point Cloud Library(PCL).</p>
 
 <h3>
 <a id="2-abstract" class="anchor" href="#2-abstract" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Abstract</h3>
 
 <p>The main focus of this project was to implement the Ball Pivot algorithm on point cloud data. The overall algorithm followed the previously mentioned paper closely. The basic idea of the algorithm is simple : there is an "advancing front" of active edges from which a ball of radius, p, is rotated around until the ball "hits" a vertex in which case the vertex is joined together with the current mesh. Newly created edges are joined to the mesh, and older edges are removed from the front. To start the algorithm, there is a seed triangle the defines the initial front from which the ball starts to pivot from.</p>
 
-<p><img src="http://gdurl.com/kBDc" alt="Advancing Front">
-<em>Advancing Front</em></p>
+<p><img src="http://gdurl.com/kBDc" alt="Advancing Front"></p>
+
+<p><em>Advancing Front</em></p>
 
 <h3>
 <a id="31-parsing-and-structuring-the-point-cloud-data" class="anchor" href="#31-parsing-and-structuring-the-point-cloud-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.1 Parsing and Structuring the Point Cloud Data</h3>
 
-<p>To parse and structure the data I used PCL. PCL offers a PCDReader to easily parse .pcd files into their PointCloud data structure. From this I used PCL's KDTree to organize the parsed vertices. I did this because the Ball Pivot Algorithm(BPA) involves pivoting a ball in space and determining whether certain vertices are hit, thus requiring a lot of spatial queries. A KDTree is very efficient in doing nearest neighbor spatial queries, also PCL had excellent support for spatially partitioning points as well as searching inside a KDTree. </p>
+<p>To parse and structure the data I used PCL. PCL offers a PCDReader to easily parse .pcd files into their PointCloud data structure. From this I used PCL's KDTree to organize the parsed vertices. I did this because the Ball Pivot Algorithm(BPA) involves pivoting a ball in space and determining whether certain vertices are hit, thus requiring a lot of spatial queries. A KDTree is very efficient in doing nearest neighbor spatial queries, also PCL had excellent support for spatially partitioning points as well as searching inside a KDTree.</p>
 
 <h3>
-<a id="32-selecting-a-seed-triangle" class="anchor" href="#32-selecting-a-seed-triangle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.2 Selecting a Seed Triangle</h3>
+<a id="32-calculating-the-normal" class="anchor" href="#32-calculating-the-normal" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.2 Calculating the normal</h3>
 
-<p>An initial front of edges is created by selecting a seed triangle. I selected a seed triangle by getting any random point not yet used by the algorithm, then searching with the nearest neighboring points until I found 2 other points that formed a triangle that satisfied two conditions: the triangle is consistent with the surface normals and a p-radius ball contains all three points without having any other points inside. The initial front would be the edges of this triangle. </p>
+<p>Calculating normal vectors for unstructured point cloud data comes down to estimating the normal by fitting a least-squares plane around k-neighboring points. For determining the sign of the normal, we can assume to orient everything towards the viewpoint. PCL already provides methods for doing this using outlined <a href="normals">here</a>. </p>
+
+<p><img src="http://gdurl.com/koAO" alt="kneighbors"></p>
 
 <h3>
-<a id="33-ball-pivoting" class="anchor" href="#33-ball-pivoting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.3 Ball Pivoting</h3>
+<a id="33-selecting-a-seed-triangle" class="anchor" href="#33-selecting-a-seed-triangle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.3 Selecting a Seed Triangle</h3>
 
-<p>Anytime we pivot the ball, we need to look within a radius p for points the the ball would hit as it pivoted long an edge. Below is a diagram depicting the required dimensions to check for collision of the ball with a vertex. We need to query points within a 2*p distance from the points that we are querying from. For each potential point we need to check that </p>
+<p>An initial front of edges is created by selecting a seed triangle. I selected a seed triangle by getting any random point not yet used by the algorithm, then searching with the nearest neighboring points until I found 2 other points that formed a triangle that satisfied two conditions: the triangle is consistent with the surface normals and a p-radius ball contains all three points without having any other points inside. The initial front is the edges of this triangle.</p>
 
-<p><img src="http://gdurl.com/u2lL" alt="Ball pivot dimension">
-<img src="http://patentimages.storage.googleapis.com/US6968299B1/US06968299-20051122-D00000.png" alt="3D Representation"></p>
+<p><img src="http://gdurl.com/2dPf" alt="seeds"></p>
 
-<p>[rviz] : <a href="http://wiki.ros.org/rviz">http://wiki.ros.org/rviz</a>
-[ros_pubsub] : <a href="http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber">http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber</a>
-[stanford_3d] : <a href="http://graphics.stanford.edu/data/3Dscanrep/">http://graphics.stanford.edu/data/3Dscanrep/</a>
-[bpa] : <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf</a>
-[poisson] : <a href="http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf">http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf</a>
-[pcd_files] : <a href="https://github.com/PointCloudLibrary/data">https://github.com/PointCloudLibrary/data</a></p>
+<h3>
+<a id="34-ball-pivoting" class="anchor" href="#34-ball-pivoting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.4 Ball Pivoting</h3>
+
+<p>Anytime we pivot the ball, we need to look within a radius p for points the the ball would hit as it pivoted long an edge. We need to query points within a 2*p distance from the points that we are querying from. Starting from an active edge, we first calculate the midpoint of the edge,  For every point within this neighborhood we compute the center of a sphere touch v0, v1 (points from the original edge), and vn(new point we are testing), if such a ball exists. The center of this sphere, cx, intersects with the circular path that our ball draws, in two points. We choose the first of these points. For all points taken into consideration, we must also consider whether or not the generated face's normal is consistent with the face that the pivot edge belongs to.</p>
+
+<p><img src="http://patentimages.storage.googleapis.com/US6968299B1/US06968299-20051122-D00000.png" alt="3D Representation"></p>
+
+<h3>
+<a id="4-results-and-technical-difficulties" class="anchor" href="#4-results-and-technical-difficulties" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>4. Results and Technical Difficulties</h3>
+
+<p>Mesh generation of a single side of the Stanford Bunny. Tried with various radius sizes, r=0.01, 0.02 displayed here. You can see as the radius of the ball increases more points are missed and you get a lower resolution mesh. The mesh generation is far from perfect, but the original point cloud itself was a little sparse.</p>
+
+<p><img src="http://gdurl.com/Hmrc" alt="original_mesh"></p>
+
+<p><em>Original Mesh</em></p>
+
+<p><img src="http://gdurl.com/64MI" alt="r001"></p>
+
+<p><em>Radius 0.01 Generated Mesh</em></p>
+
+<p><img src="http://gdurl.com/bdeQ" alt="r002"></p>
+
+<p>I tried it with a bigger point cloud of a few thousand points. This point cloud has around ~3500 points. The mesh was generated with a radius of 5.0. You can see that the tail area of the point cloud cat has points spaced much farther apart, and this causes disconnected parts of the mesh. The tail is still partially rendered because the algorithm keeps generating the mesh from new seed triangles until they can no longer be generated. </p>
+
+<p><img src="http://gdurl.com/J0dY" alt="cat_cloud"></p>
+
+<p><em>Original Point Cloud ~3500 points</em></p>
+
+<p><img src="http://gdurl.com/rlmk" alt="cat_mesh"></p>
+
+<p><em>Radius 5.0 Generated Mesh</em></p>
+
+<p>The hardest thing about this algorithm was deciding on the correct radius value for my pivoting ball. During simple testing I just looked at the vertex values and set some random scale for my ball radius, but some meshes have varied areas of dense point clouds versus sparse point clouds. The tail area of the cat mesh shows what happens when certain areas of the mesh have sparser clouds than others. The main body was generated well, but the tail had disconnected parts of the meshes. I was playing around with ways to dynamically set the radius based off of sampled subsets of the points as well as increasing the pivot ball's radius at an active edge and trying again when it couldn't find a point. But I couldn't get it to work successfully in time. This is one of the things that I plan to improve upon in the future.</p>
+
+<p>Another thing I found difficult was that despite using PCL's normal estimator, a lot of my surface normals were not being approximated correctly. I'm not sure if this is because there is a bug in my code, or if I did not set a high enough k neighbor value for plane fitting, but I found that because of incorrect normals some mesh surfaces, especially around sharp curvatures such as feet, tails, or other circular meshes. You can see this effect in the cat mesh as well. Some parts of the surface have normals inconsistent with the rest of the mesh that cause the feet and face part of the cat to have mesh generation be cut off. This is also something I want to improve and fix in the future.</p>
+
+<h3>
+<a id="future-todo-list" class="anchor" href="#future-todo-list" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Future Todo List</h3>
+
+<ul>
+<li>Fix bugs in normal estimation</li>
+<li>Dynamic ball radius</li>
+<li>Implement some of the out of core algorithms talked about in the original paper to handle larger meshes</li>
+<li>Try incorporating streaming point cloud data from a UAV using ROS</li>
+</ul>
+
+<h3>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>References</h3>
+
+<p>For this project, I heavily referenced the <a href="pcldocs">PCL documentation</a>. I also read more about the algorithm and used some images from <a href="bpapres">this</a> presentation I found on the web.</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/shinmyung0/pcltomesh">Point Cloud to Mesh</a> is maintained by <a href="https://github.com/shinmyung0">shinmyung0</a>.</span>
