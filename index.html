@@ -63,7 +63,7 @@ Libraries : Point Cloud Library (File parsing, Data manipulation), Eigen (Vector
 </ul>
 
 <h1>
-<a id="final-report-current-state-of-the-project-as-of-may-4th" class="anchor" href="#final-report-current-state-of-the-project-as-of-may-4th" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Final Report (Current state of the project as of May 4th)</h1>
+<a id="final-report-as-of-may-4th" class="anchor" href="#final-report-as-of-may-4th" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Final Report (As of May 4th)</h1>
 
 <h3>
 <a id="1-summary" class="anchor" href="#1-summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Summary</h3>
@@ -75,7 +75,26 @@ Libraries : Point Cloud Library (File parsing, Data manipulation), Eigen (Vector
 
 <p>The main focus of this project was to implement the Ball Pivot algorithm on point cloud data. The overall algorithm followed the previously mentioned paper closely. The basic idea of the algorithm is simple : there is an "advancing front" of active edges from which a ball of radius, p, is rotated around until the ball "hits" a vertex in which case the vertex is joined together with the current mesh. Newly created edges are joined to the mesh, and older edges are removed from the front. To start the algorithm, there is a seed triangle the defines the initial front from which the ball starts to pivot from.</p>
 
-<p><img src="https://drive.google.com/file/d/0BzGKQAoknGiIajhKYzR1VV8xWXM/view?usp=sharing" alt="Advancing Front"></p>
+<p><img src="https://drive.google.com/file/d/0BzGKQAoknGiIajhKYzR1VV8xWXM/view?usp=sharing" alt="Advancing Front">
+<em>Advancing Front</em></p>
+
+<h3>
+<a id="31-parsing-and-structuring-the-point-cloud-data" class="anchor" href="#31-parsing-and-structuring-the-point-cloud-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.1 Parsing and Structuring the Point Cloud Data</h3>
+
+<p>To parse and structure the data I used PCL. PCL offers a PCDReader to easily parse .pcd files into their PointCloud data structure. From this I used PCL's KDTree to organize the parsed vertices. I did this because the Ball Pivot Algorithm(BPA) involves pivoting a ball in space and determining whether certain vertices are hit, thus requiring a lot of spatial queries. A KDTree is very efficient in doing nearest neighbor spatial queries, also PCL had excellent support for spatially partitioning points as well as searching inside a KDTree. </p>
+
+<h3>
+<a id="32-selecting-a-seed-triangle" class="anchor" href="#32-selecting-a-seed-triangle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.2 Selecting a Seed Triangle</h3>
+
+<p>An initial front of edges is created by selecting a seed triangle. I selected a seed triangle by getting any random point not yet used by the algorithm, then searching with the nearest neighboring points until I found 2 other points that formed a triangle that satisfied two conditions: the triangle is consistent with the surface normals and a p-radius ball contains all three points without having any other points inside. The initial front would be the edges of this triangle. </p>
+
+<h3>
+<a id="33-ball-pivoting" class="anchor" href="#33-ball-pivoting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.3 Ball Pivoting</h3>
+
+<p>Anytime we pivot the ball, we need to look within a radius p for points the the ball would hit as it pivoted long an edge. Below is a diagram depicting the required dimensions to check for collision of the ball with a vertex. We need to query points within a 2*p distance from the points that we are querying from. For each potential point we need to check that </p>
+
+<p><img src="http://gdurl.com/u2lL" alt="Ball pivot dimension">
+<img src="http://patentimages.storage.googleapis.com/US6968299B1/US06968299-20051122-D00000.png" alt="3D Representation"></p>
 
 <p>[rviz] : <a href="http://wiki.ros.org/rviz">http://wiki.ros.org/rviz</a>
 [ros_pubsub] : <a href="http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber">http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber</a>
