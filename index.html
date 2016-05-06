@@ -19,13 +19,16 @@
     </section>
 
     <section class="main-content">
-      <h3>
-<a id="team" class="anchor" href="#team" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Team</h3>
+      <h1>
+<a id="project-proposal" class="anchor" href="#project-proposal" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Proposal</h1>
+
+<h3>
+<a id="1-team" class="anchor" href="#1-team" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Team</h3>
 
 <p>Shin Yoon</p>
 
 <h3>
-<a id="background" class="anchor" href="#background" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Background</h3>
+<a id="2-background" class="anchor" href="#2-background" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Background</h3>
 
 <p>The idea is simple. A point cloud is just a bunch of unordered vertices. What we want to do is to group these vertices into triangles to form a mesh. Why is this useful? This is extremely useful in fields like 3D reconstruction, where you have large amounts of point cloud data from RGBD cameras or lidar, and you want to recreate a mesh representing the object that you scanned. This is how meshes of objects scanned for 3D printers are generated. This is also useful in SLAM(Simultaneous Localization and Mapping) for robots trying to create a 3D reconstruction of their surroundings. </p>
 
@@ -34,7 +37,7 @@
 <p>To start off I plan to try to implement <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">this paper</a> using the mesh data provided <a href="http://graphics.stanford.edu/data/3Dscanrep/">here</a>. Afterwards, once I get it working on standard data sets, I want to try to implement a form of down sampling as well to try and simplify the point cloud before running a meshing algorithm on it. This part is important because in our own research, the point clouds that are generated are extremely dense, but a lot of the data can be reduced and still generate a nice mesh. But the main goal for this project is to actual implement the mesh generation algorithm.</p>
 
 <h3>
-<a id="resources" class="anchor" href="#resources" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Resources</h3>
+<a id="3-resources" class="anchor" href="#3-resources" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3. Resources</h3>
 
 <p>Language + Platform : C++/ OpenGL 
 Libraries : Point Cloud Library (File parsing, Data manipulation), Eigen (Vector, Matrix), CS184 HW2 MeshEdit</p>
@@ -42,22 +45,44 @@ Libraries : Point Cloud Library (File parsing, Data manipulation), Eigen (Vector
 <p>I am planning on using our hw2 code base to use as the starting point. I think the visualizer was useful and using that as the starting point will help me debug and implement faster. </p>
 
 <h3>
-<a id="goals-and-deliverables" class="anchor" href="#goals-and-deliverables" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Goals and Deliverables</h3>
+<a id="4-goals-and-deliverables" class="anchor" href="#4-goals-and-deliverables" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>4. Goals and Deliverables</h3>
 
-<p>My main deliverable will be to demo the mesh generation algorithm using vertices from the <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3D Scanning Repository</a>. I plan to implement the <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">ball pivot algorithm</a> to show how vertices can be grouped together to form a mesh.</p>
+<p>My main deliverable will be to demo the mesh generation algorithm using vertices from the <a href="stanford_3d">Stanford 3D Scanning Repository</a>. I plan to implement the <a href="bpa">Ball Pivot Algorithm</a> to show how vertices can be grouped together to form a mesh.</p>
 
 <p><img src="http://cs184.eecs.berkeley.edu/cs184_sp16_content/article_images/21_2.jpg" alt="Point Cloud to Mesh"></p>
 
-<p>In terms of aspirational goals, I want to also implement the <a href="http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf">Poisson Surface Reconstruction Algorithm</a> and do a comparison of the two methods on a model. Then if that goes well, I want to try to run my algorithm on actual point cloud data from the SLAM program that we are running in my research project. This would hopefully generate a rough mesh of whatever the RGBD camera is seeing localized. This would involve writing a <a href="http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber">ROS Publisher/Subscriber</a> wrapper around my mesh generator, and streaming the data from the SLAM program and back out into <a href="http://wiki.ros.org/rviz">Rviz</a>. </p>
+<p>In terms of aspirational goals, I want to also implement the <a href="poisson">Poisson Surface Reconstruction Algorithm</a> and do a comparison of the two methods on a model. Then if that goes well, I want to try to run my algorithm on actual point cloud data from the SLAM program that we are running in my research project. This would hopefully generate a rough mesh of whatever the RGBD camera is seeing localized. This would involve writing a <a href="ros_pubsub">ROS Publisher/Subscriber</a> wrapper around my mesh generator, and streaming the data from the SLAM program and back out into <a href="rviz">Rviz</a>. </p>
 
 <h3>
-<a id="intended-schedule" class="anchor" href="#intended-schedule" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Intended Schedule</h3>
+<a id="5-intended-schedule" class="anchor" href="#5-intended-schedule" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>5. Intended Schedule</h3>
 
 <ul>
 <li>April 24th - Finish the Ball Pivot Algorithm + Downsampling + augment HW2 code base to incorporate it</li>
 <li>May 1st - try to implement Poisson Surface Reconstruction and compare with Ball Pivot Algorithm</li>
 <li>May 3rd - Possibly look into ROS integration and writing a publisher/subscriber, prepare demo.</li>
 </ul>
+
+<h1>
+<a id="final-report-current-state-of-the-project-as-of-may-4th" class="anchor" href="#final-report-current-state-of-the-project-as-of-may-4th" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Final Report (Current state of the project as of May 4th)</h1>
+
+<h3>
+<a id="1-summary" class="anchor" href="#1-summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Summary</h3>
+
+<p>This is the final report write up for CS184 Spring 2016. I finished my main goal of implementing the Ball Pivoting Algorithm to generate a mesh from point cloud data, although I did not quite reach my aspirational goals. In the process of implementing this project, I learned a lot about the trade offs involved in generating a mesh from point cloud data. I plan to continue to develop on this project even after this semester, and hopefully reach my aspirational goals some time in the future, mainly testing out Poisson Surface Reconstruction as well as integration with UAV point cloud data. There were some divergences from my original proposal, mainly involving the data sets being used. I originally planned to use the Stanford 3D Scanning Repository, but when I opened the .ply files, I found that there were already polygon relationships defined inside. I wanted to test on more realistic point cloud data, so instead I found <a href="pcd_files">this</a> which were .pcd containing only vertices. This format was specifically designed to contain point cloud data, and also the format was well supported within the Point Cloud Library(PCL).</p>
+
+<h3>
+<a id="2-abstract" class="anchor" href="#2-abstract" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Abstract</h3>
+
+<p>The main focus of this project was to implement the Ball Pivot algorithm on point cloud data. The overall algorithm followed the previously mentioned paper closely. The basic idea of the algorithm is simple : there is an "advancing front" of active edges from which a ball of radius, p, is rotated around until the ball "hits" a vertex in which case the vertex is joined together with the current mesh. Newly created edges are joined to the mesh, and older edges are removed from the front. To start the algorithm, there is a seed triangle the defines the initial front from which the ball starts to pivot from.</p>
+
+<p><img src="https://drive.google.com/file/d/0BzGKQAoknGiIajhKYzR1VV8xWXM/view?usp=sharing" alt="Advancing Front"></p>
+
+<p>[rviz] : <a href="http://wiki.ros.org/rviz">http://wiki.ros.org/rviz</a>
+[ros_pubsub] : <a href="http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber">http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber</a>
+[stanford_3d] : <a href="http://graphics.stanford.edu/data/3Dscanrep/">http://graphics.stanford.edu/data/3Dscanrep/</a>
+[bpa] : <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf</a>
+[poisson] : <a href="http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf">http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf</a>
+[pcd_files] : <a href="https://github.com/PointCloudLibrary/data">https://github.com/PointCloudLibrary/data</a></p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/shinmyung0/pcltomesh">Point Cloud to Mesh</a> is maintained by <a href="https://github.com/shinmyung0">shinmyung0</a>.</span>
